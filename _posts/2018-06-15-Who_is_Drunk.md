@@ -3,7 +3,7 @@ title: "Exploratory data science project"
 date: 2018-06-15
 tags: [data science, R, Ames drink project]
 header:
- image: "images/Amesdrunk"
+# image: "images/Amesdrunk"
 excerpt: "Data Science project"
 mathjax: true
 ---
@@ -61,4 +61,4 @@ Here is an image:
 
 Here is some math:
 
-$$z = $$x + $$y 
+$$z = x + y$$
