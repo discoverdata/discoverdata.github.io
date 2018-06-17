@@ -5,6 +5,7 @@ tags: [data science, R, Ames drink project]
 header:
 	image: "images/Amesdrunk"
 excerpt: "Data Science project"
+mathjax: true
 ---
 
 # H1 heading 
