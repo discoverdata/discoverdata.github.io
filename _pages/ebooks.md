@@ -2,7 +2,6 @@
 layout: default
 title: E-books
 permalink: /ebooks/
- image: "/images/books.jpg"
 ---
 # Notable ebooks
 
