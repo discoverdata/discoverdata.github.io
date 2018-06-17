@@ -1,5 +1,5 @@
 ---
-layout: archive
+layout: page
 permalink: /projects/
 title: "Machine Learning Posts by Tags"
 author_profile: true

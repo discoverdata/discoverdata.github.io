@@ -1,6 +1,9 @@
 ---
 layout: page
-title: Ebooks
+title: E-books
+permalink: /ebooks/
+header:
+ image: "/images/books.jpg"
 ---
 # Notable ebooks
 
