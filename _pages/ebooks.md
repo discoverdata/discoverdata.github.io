@@ -1,11 +1,11 @@
 ---
-layout: page
+layout: default
 title: E-books
 permalink: /ebooks/
-header:
  image: "/images/books.jpg"
 ---
 # Notable ebooks
 
 ## Perl
-- [Perl Cookbook](/ebooks/Perl_Cookbook.pdf)
+- [Teach yourself Perl in 21 days](/ebooks/Teach_Yourself_Perl_21_Days.pdf)
+- [Beginning Perl for Bioinformatics](/ebooks/Beginning_Perl_Bioinformatics.pdf)

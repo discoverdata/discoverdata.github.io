@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: default
 permalink: /projects/
 title: "Machine Learning Posts by Tags"
 author_profile: true
