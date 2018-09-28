@@ -3,7 +3,7 @@ title: "Intermediate SQL course"
 author: "Varun Khanna"
 date: "26 September 2018"
 output:
-  html_document:
+  layout: default
     highlight: kate
     code_folding: hide
     number_sections: yes
