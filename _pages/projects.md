@@ -1,9 +1,12 @@
 ---
-layout: default
+layout: archive
 permalink: /projects/
 title: "Machine Learning Posts by Tags"
 author_profile: true
+header:
+ image:"/images/adelaide.jpg"
 ---
+
 {% include base_path %}
 {% include group-by-array collection=site.posts fields="tags" %}
 
