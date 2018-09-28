@@ -13,10 +13,7 @@ output:
       smooth_scroll: yes
 ---
 
-```{r global_options, include=FALSE}
-library(knitr)
-knitr::opts_chunk$set(fig.width = 8, fig.height = 7, fig.path = 'Figs/', warning = FALSE, message = FALSE)
-```
+
 
 # Welcome
 
@@ -50,7 +47,8 @@ By finishing this tutorial, students will be able to:
 
 We are going to use the RSQLite package in the following tutorial and the Amazon stock price [dataset](data/AMZN.csv).  
 
-```{r loadStockData, results='hide'}
+
+```r
 library(DBI)
 AMZN <- read.table("data/AMZN.csv", stringsAsFactors = FALSE, header = TRUE, sep = ",")
 # Create a database connection
@@ -81,16 +79,37 @@ SELECT [ALL | DISTINCT] column(s) FROM table [WHERE "condition(s)"] [GROUP BY co
 
 **Example 1:** Look at all the columns for the first 5 rows of the dataset.
 
-```{r look_1}
+
+```r
 kable(dbGetQuery(stock, 'SELECT * FROM amazon LIMIT 5'))
 ```
+
+
+
+|Date       | year| month| day|     Open|     High|      Low|    Close| Adj.Close|   Volume|
+|:----------|----:|-----:|---:|--------:|--------:|--------:|--------:|---------:|--------:|
+|1997-05-15 | 1997|     5|  15| 2.437500| 2.500000| 1.927083| 1.958333|  1.958333| 72156000|
+|1997-05-16 | 1997|     5|  16| 1.968750| 1.979167| 1.708333| 1.729167|  1.729167| 14700000|
+|1997-05-19 | 1997|     5|  19| 1.760417| 1.770833| 1.625000| 1.708333|  1.708333|  6106800|
+|1997-05-20 | 1997|     5|  20| 1.729167| 1.750000| 1.635417| 1.635417|  1.635417|  5467200|
+|1997-05-21 | 1997|     5|  21| 1.635417| 1.645833| 1.375000| 1.427083|  1.427083| 18853200|
 
 **ALL** and **DISTINCT** are keywords used to select ALL (by default) or unique rows in the query by discarding the duplicate entries. 
 
 **Example 2:** What are the first five DISTINCT years in the dataset?
 
-```{r look_2}
+
+```r
 dbGetQuery(stock, 'SELECT DISTINCT year FROM amazon LIMIT 5')
+```
+
+```
+##   year
+## 1 1997
+## 2 1998
+## 3 1999
+## 4 2000
+## 5 2001
 ```
 
 #### Aggregate functions  
@@ -100,32 +119,56 @@ SQL is excellent for aggregating data. Following are the **aggregate functions s
 
 **Example 3:** Count the total number of rows in the dataset.
 
-```{r count_1}
+
+```r
 dbGetQuery(stock, 'SELECT COUNT(*) AS "total_rows" FROM amazon')
+```
+
+```
+##   total_rows
+## 1       5350
 ```
 
 `SUM()` - It adds all the values of a given column. It treats nulls as 0. 
 
 **Example 4:** Find the total volume traded for Amazon stock in the dataset.
 
-```{r sum_1}
+
+```r
 dbGetQuery(stock, 'SELECT SUM(Volume) AS "total_vol" FROM amazon')
+```
+
+```
+##     total_vol
+## 1 41570051200
 ```
 
 `MIN()/MAX()` - It returns the minimum and the maximum numerical or non-numerical values in a column.  
 
 **Example 5:** Return the first and last date Amazon stock was traded according to the dataset.
 
-```{r min_max_1}
+
+```r
 dbGetQuery(stock, 'SELECT MIN(Date) AS min_date, MAX(Date) AS max_date FROM amazon')
+```
+
+```
+##     min_date   max_date
+## 1 1997-05-15 2018-08-16
 ```
 
 `AVG()` - It returns the average of the values from a selected group. It can only be used for numerical columns and ignores null values.
 
 **Example 6:** Return the average open price for the stock.
 
-```{r avg_1}
+
+```r
 dbGetQuery(stock, 'SELECT AVG(Open) AS avg_open FROM amazon')
+```
+
+```
+##   avg_open
+## 1 228.7646
 ```
 
 #### GROUP BY and ORDER BY clause  
@@ -138,17 +181,39 @@ Information retrieved from a database using SQL can be placed into separate cate
 
 **Example 7:** Count number of days traded each year.
 
-```{r count_2}
+
+```r
 kable(dbGetQuery(stock, 'SELECT year, COUNT(*) AS days_traded FROM amazon GROUP BY year LIMIT 5'))
 ```
+
+
+
+| year| days_traded|
+|----:|-----------:|
+| 1997|         160|
+| 1998|         252|
+| 1999|         252|
+| 2000|         252|
+| 2001|         248|
 
 ##### `GROUP BY` multiple columns
 
 **Example 8:** Count number of days traded in months of each year.
 
-```{r count_3}
+
+```r
 kable(dbGetQuery(stock, 'SELECT year, month, COUNT(*) AS days_traded FROM amazon GROUP BY year, month LIMIT 5'))
 ```
+
+
+
+| year| month| days_traded|
+|----:|-----:|-----------:|
+| 1997|     5|          11|
+| 1997|     6|          21|
+| 1997|     7|          22|
+| 1997|     8|          21|
+| 1997|     9|          21|
   
 ##### `GROUP BY` column numbers  
 
@@ -156,17 +221,39 @@ We can substitute column names with column numbers in the `GROUP BY` clause.
 
 **Example 9:** `GROUP BY` Column 1 and 2
 
-```{r count_4}
+
+```r
 kable(dbGetQuery(stock, 'SELECT year, month, COUNT(*) AS days_traded FROM amazon GROUP BY 1, 2 LIMIT 5'))
 ```
+
+
+
+| year| month| days_traded|
+|----:|-----:|-----------:|
+| 1997|     5|          11|
+| 1997|     6|          21|
+| 1997|     7|          22|
+| 1997|     8|          21|
+| 1997|     9|          21|
 
 ##### `ORDER BY` column names or numbers
 
 **Example 10:** Sort the results of the previous query in descending order of the year.
 
-```{r count_5}
+
+```r
 kable(dbGetQuery(stock, 'SELECT year, month, COUNT(*) AS days_traded FROM amazon GROUP BY 1, 2 ORDER BY year DESC LIMIT 5'))
 ```
+
+
+
+| year| month| days_traded|
+|----:|-----:|-----------:|
+| 2018|     1|          21|
+| 2018|     2|          19|
+| 2018|     3|          21|
+| 2018|     4|          21|
+| 2018|     5|          22|
 
 #### HAVING Clause
 
@@ -177,18 +264,42 @@ kable(dbGetQuery(stock, 'SELECT year, month, COUNT(*) AS days_traded FROM amazon
 
 Find the average open price of Amazon for each month of each year in the dataset. 
 
-```{r having_1}
+
+```r
 kable(dbGetQuery(stock,
 'SELECT year,month,avg(open) AS avg_open_price FROM amazon GROUP BY year,month LIMIT 5'))
 ```
+
+
+
+| year| month| avg_open_price|
+|----:|-----:|--------------:|
+| 1997|     5|       1.686553|
+| 1997|     6|       1.547867|
+| 1997|     7|       2.168561|
+| 1997|     8|       2.222966|
+| 1997|     9|       3.424107|
 
 **Example 12:**
 
 Find every month of each year where Amazon stock price was above $1500/share.
 
-```{r having}
+
+```r
 kable(dbGetQuery(stock, 'SELECT year, month, MAX(high) AS month_high FROM amazon GROUP BY year, month HAVING month_high > 1500 ORDER BY year, month'))
 ```
+
+
+
+| year| month| month_high|
+|----:|-----:|----------:|
+| 2018|     2|    1528.70|
+| 2018|     3|    1617.54|
+| 2018|     4|    1638.10|
+| 2018|     5|    1635.00|
+| 2018|     6|    1763.10|
+| 2018|     7|    1880.05|
+| 2018|     8|    1925.00|
 
 ### Exercise 1
 
@@ -196,49 +307,116 @@ kable(dbGetQuery(stock, 'SELECT year, month, MAX(high) AS month_high FROM amazon
 
 _Sample Output_   
 
-```{r ex1}
+
+```r
 kable(dbGetQuery(stock,'SELECT * FROM amazon WHERE (year = 2014 OR date > "2016-01-01") ORDER BY day LIMIT 5'))
 ```
+
+
+
+|Date       | year| month| day|   Open|   High|    Low|  Close| Adj.Close|  Volume|
+|:----------|----:|-----:|---:|------:|------:|------:|------:|---------:|-------:|
+|2014-04-01 | 2014|     4|   1| 338.09| 344.43| 338.00| 342.99|    342.99| 3600100|
+|2014-05-01 | 2014|     5|   1| 304.13| 310.48| 304.00| 307.89|    307.89| 4328600|
+|2014-07-01 | 2014|     7|   1| 325.86| 333.20| 325.10| 332.39|    332.39| 3173600|
+|2014-08-01 | 2014|     8|   1| 313.69| 315.83| 304.59| 307.06|    307.06| 7441500|
+|2014-10-01 | 2014|    10|   1| 322.04| 322.17| 315.55| 317.46|    317.46| 3089100|
 
 **2. Select all rows between the dates 2007-01-01 and 2009-01-01.**
 
 _Sample output_  
-```{r ex2}
+
+```r
 kable(dbGetQuery(stock,'SELECT * FROM amazon WHERE date BETWEEN "2007-01-01" AND "2009-01-01" LIMIT 5'))
 ```
+
+
+
+|Date       | year| month| day|  Open|  High|   Low| Close| Adj.Close|   Volume|
+|:----------|----:|-----:|---:|-----:|-----:|-----:|-----:|---------:|--------:|
+|2007-01-03 | 2007|     1|   3| 38.68| 39.06| 38.05| 38.70|     38.70| 12405100|
+|2007-01-04 | 2007|     1|   4| 38.59| 39.14| 38.26| 38.90|     38.90|  6318400|
+|2007-01-05 | 2007|     1|   5| 38.72| 38.79| 37.60| 38.37|     38.37|  6619700|
+|2007-01-08 | 2007|     1|   8| 38.22| 38.31| 37.17| 37.50|     37.50|  6783000|
+|2007-01-09 | 2007|     1|   9| 37.60| 38.06| 37.34| 37.78|     37.78|  5703000|
 
 **3. Select all rows where the year is either 2007,2008 or 2018.**
 
 _Sample output_  
-```{r ex3}
+
+```r
 kable(dbGetQuery(stock, 'SELECT * FROM amazon WHERE year IN (2007,2008,2018) LIMIT 5'))
 ```
+
+
+
+|Date       | year| month| day|  Open|  High|   Low| Close| Adj.Close|   Volume|
+|:----------|----:|-----:|---:|-----:|-----:|-----:|-----:|---------:|--------:|
+|2007-01-03 | 2007|     1|   3| 38.68| 39.06| 38.05| 38.70|     38.70| 12405100|
+|2007-01-04 | 2007|     1|   4| 38.59| 39.14| 38.26| 38.90|     38.90|  6318400|
+|2007-01-05 | 2007|     1|   5| 38.72| 38.79| 37.60| 38.37|     38.37|  6619700|
+|2007-01-08 | 2007|     1|   8| 38.22| 38.31| 37.17| 37.50|     37.50|  6783000|
+|2007-01-09 | 2007|     1|   9| 37.60| 38.06| 37.34| 37.78|     37.78|  5703000|
 
 **4. SELECT all days when Amazon stock was traded after 10th (including) for the month of January for all years after 2000 (including). **
 
 _Sample output_  
-```{r ex4}
+
+```r
 kable(dbGetQuery(stock,'SELECT * FROM amazon WHERE date LIKE "2%-01-1_" LIMIT 5'))
 ```
+
+
+
+|Date       | year| month| day|    Open|    High|     Low|   Close| Adj.Close|   Volume|
+|:----------|----:|-----:|---:|-------:|-------:|-------:|-------:|---------:|--------:|
+|2000-01-10 | 2000|     1|  10| 72.5625| 72.6250| 65.5625| 69.1875|   69.1875| 14757900|
+|2000-01-11 | 2000|     1|  11| 66.8750| 70.0000| 65.0000| 66.7500|   66.7500| 10532700|
+|2000-01-12 | 2000|     1|  12| 67.8750| 68.0000| 63.0000| 63.5625|   63.5625| 10804500|
+|2000-01-13 | 2000|     1|  13| 64.9375| 67.1875| 63.1250| 65.9375|   65.9375| 10448100|
+|2000-01-14 | 2000|     1|  14| 66.7500| 68.6250| 64.0000| 64.2500|   64.2500|  6853600|
 
 *Do it after you have done JOINS.*
 
 **5. Select all the days when the open price was above the average open price for that month. For example, if the average open price for Jan 1999 was 2.5 USD then select all the days for Jan 1999 where the open price was above 2.5 USD.** 
 
 _Sample output_  
-```{r ex5}
+
+```r
 kable(dbGetQuery(stock,'SELECT a.year,a.month,a.day,a.open,b.avg_open FROM amazon AS a INNER JOIN (SELECT year,month,avg(open) AS avg_open FROM amazon GROUP BY year,month) AS b ON a.year = b.year AND a.month = b.month AND a.open > b.avg_open LIMIT 5'))
 ```
+
+
+
+| year| month| day|     Open| avg_open|
+|----:|-----:|---:|--------:|--------:|
+| 1997|     5|  15| 2.437500| 1.686553|
+| 1997|     5|  16| 1.968750| 1.686553|
+| 1997|     5|  19| 1.760417| 1.686553|
+| 1997|     5|  20| 1.729167| 1.686553|
+| 1997|     6|   9| 1.656250| 1.547867|
 
 **6. Count the number of days now.**
 
 _Sample output_  
-```{r ex6}
+
+```r
 kable(dbGetQuery(stock,'SELECT a.year,a.month,COUNT(day) AS num_days, b.avg_open FROM amazon AS a INNER JOIN (SELECT year,month,avg(open) AS avg_open FROM amazon GROUP BY year,month) AS b ON a.year = b.year AND a.month = b.month AND a.open > b.avg_open GROUP BY a.year, a.month LIMIT 5'))
 ```
 
+
+
+| year| month| num_days| avg_open|
+|----:|-----:|--------:|--------:|
+| 1997|     5|        4| 1.686553|
+| 1997|     6|        7| 1.547867|
+| 1997|     7|       15| 2.168561|
+| 1997|     8|       11| 2.222966|
+| 1997|     9|       10| 3.424107|
+
 **Disconnect from the stock database**
-```{r disconnect_1, results='hide'}
+
+```r
 dbDisconnect(stock)
 ```
 
@@ -252,7 +430,8 @@ For the next few lessons you are going to use three datasets _viz._ [drugs names
 
 ### Load the data and create the database connection
 
-```{r loadDrugsData, results='hide'}
+
+```r
 drugs_data <- read.table("data/drugs/drugs_data", sep = "\t",header = T, stringsAsFactors = F)
 
 drugs_target <- read.table("data/drugs/drugs_target", sep = ",",header = T, stringsAsFactors = F, quote = "\"")
@@ -272,11 +451,48 @@ dbWriteTable(drugs, "drugs_names",drugs_names, overwrite = TRUE)
 
 Display the records in each table
 
-```{r showDrugsData}
+
+```r
 kable(dbGetQuery(drugs, 'SELECT * FROM drugs_names LIMIT 5'))
+```
+
+
+
+|drugBankID |name                 |      cid|
+|:----------|:--------------------|--------:|
+|DB00115    |Cyanocobalamin       | 44176380|
+|DB00116    |Tetrahydrofolic acid |    91443|
+|DB00117    |L-Histidine          |     6274|
+|DB00118    |S-Adenosylmethionine |    34756|
+|DB00119    |Pyruvic acid         |     1060|
+
+```r
 kable(dbGetQuery(drugs, 'SELECT * FROM drugs_data LIMIT 5'))
+```
+
+
+
+|      cid| complexity| hbond_acceptors| hbond_donors| rotatable_bond|molecular_formula | molecular_weight|  tpsa| total_charge| heavy_atom_count| tautomer_count|
+|--------:|----------:|---------------:|------------:|--------------:|:-----------------|----------------:|-----:|------------:|----------------:|--------------:|
+| 44176380|       3220|              21|           10|             16|C63H89CoN14O14P   |         1356.396| 473.0|            0|               93|           1000|
+|    91443|        834|               9|            8|              9|C19H23N7O6        |          445.436| 207.0|            0|               32|             85|
+|     6274|        151|               4|            3|              3|C6H9N3O2          |          155.157|  92.0|            0|               11|              2|
+|    34756|        533|              10|            5|              7|C15H23N6O5S+      |          399.446| 184.0|            1|               27|              3|
+|     1060|         84|               3|            1|              1|C3H4O3            |           88.062|  54.4|            0|                6|              2|
+
+```r
 kable(dbGetQuery(drugs, 'SELECT * FROM drugs_target LIMIT 5'))
 ```
+
+
+
+|drugBankID |name      |type        |uniProtID |proteinName                                                |
+|:----------|:---------|:-----------|:---------|:----------------------------------------------------------|
+|DB00001    |Lepirudin |BiotechDrug |P00734    |Prothrombin                                                |
+|DB00002    |Cetuximab |BiotechDrug |P00533    |Epidermal growth factor receptor                           |
+|DB00002    |Cetuximab |BiotechDrug |O75015    |Low affinity immunoglobulin gamma Fc region receptor III-B |
+|DB00002    |Cetuximab |BiotechDrug |P00736    |Complement C1r subcomponent                                |
+|DB00002    |Cetuximab |BiotechDrug |P02745    |Complement C1q subcomponent subunit A                      |
 
 All the displayed tables are self-explanatory. However, a brief description is given below:
 
@@ -306,26 +522,59 @@ SELECT table1.column_name(s) FROM table1 WHERE search_condition ( Subquery);
 
 Select drugbank id, names of drugs with molecular weight less than equal to 500 from *drugs_names* and *drugs_data* tables.
 
-```{r sub_1}
+
+```r
 kable(dbGetQuery(drugs,"SELECT dn.drugBankID, dn.name FROM drugs_names AS dn WHERE dn.cid IN ( SELECT dd.cid FROM drugs_data AS dd WHERE dd.molecular_weight <= 500) LIMIT 5"))
 ```
+
+
+
+|drugBankID |name                 |
+|:----------|:--------------------|
+|DB00116    |Tetrahydrofolic acid |
+|DB00117    |L-Histidine          |
+|DB00118    |S-Adenosylmethionine |
+|DB00119    |Pyruvic acid         |
+|DB00120    |L-Phenylalanine      |
 
 **Example 2a:**
 
 Select the count of drugs that bind to a protein target and sort the results by drugs count (no subquery required). 
 
-```{r sub_2_1}
+
+```r
 kable(dbGetQuery(drugs,
 "SELECT  uniprotID, proteinName, COUNT(*) as drugs_count FROM drugs_target GROUP BY uniprotID, proteinName ORDER BY drugs_count DESC LIMIT 5"))
 ```
+
+
+
+|uniProtID |proteinName                                      | drugs_count|
+|:---------|:------------------------------------------------|-----------:|
+|P14867    |Gamma-aminobutyric acid receptor subunit alpha-1 |          89|
+|P35348    |Alpha-1A adrenergic receptor                     |          88|
+|P35367    |Histamine H1 receptor                            |          84|
+|P11229    |Muscarinic acetylcholine receptor M1             |          80|
+|P14416    |D(2) dopamine receptor                           |          76|
 
 **Example 2b:**
 
 Select drugbank id, protein id and protein name from *drugs_target* table where a protein target binds to more than 40 drugs. (subquery required).
 
-```{r sub_2_2}
+
+```r
 kable(dbGetQuery(drugs,"SELECT drugBankID,uniProtID,proteinName FROM drugs_target WHERE uniprotID IN(SELECT uniProtID FROM drugs_target GROUP BY uniprotID HAVING COUNT(uniprotID) >40) ORDER BY drugBankID LIMIT 5"))
 ```
+
+
+
+|drugBankID |uniProtID |proteinName                            |
+|:----------|:---------|:--------------------------------------|
+|DB00154    |P35354    |Prostaglandin G/H synthase 2           |
+|DB00154    |P23219    |Prostaglandin G/H synthase 1           |
+|DB00159    |P35354    |Prostaglandin G/H synthase 2           |
+|DB00159    |P23219    |Prostaglandin G/H synthase 1           |
+|DB00176    |P31645    |Sodium-dependent serotonin transporter |
 
 **Note:**There are many instances where a protein target binds to more than one drug (like Histamine H1 receptor binds 49 drugs) however, there are drugs which bind to many protein targets. For example, **DB00215** shown in the table above binds to two different protein targets. This may explain why drugs have side effects.
 
@@ -333,9 +582,20 @@ kable(dbGetQuery(drugs,"SELECT drugBankID,uniProtID,proteinName FROM drugs_targe
 
 Let us now count the number of protein targets each drug binds to and sort the results by protein count (no subquery required).  
 
-```{r sub_3_1}
+
+```r
 kable(dbGetQuery(drugs,"SELECT  drugBankID, COUNT(*) AS protein_count FROM drugs_target GROUP BY drugBankID ORDER BY protein_count DESC LIMIT 5"))
 ```
+
+
+
+|drugBankID | protein_count|
+|:----------|-------------:|
+|DB03147    |            85|
+|DB00898    |            51|
+|DB00334    |            50|
+|DB00543    |            48|
+|DB01049    |            41|
 
 There are two drugs **DB03147** and **DB01049** which binds to more than 40 protein targets.
 
@@ -343,9 +603,20 @@ There are two drugs **DB03147** and **DB01049** which binds to more than 40 prot
 
 Now let us find all the protein targets these drugs bind to.
 
-```{r sub_3_2}
+
+```r
 kable(dbGetQuery(drugs,"SELECT drugBankID,uniProtID,proteinName FROM drugs_target WHERE drugBankID IN (SELECT drugBankID FROM drugs_target GROUP BY drugBankID HAVING COUNT(drugBankID) > 40) LIMIT 5"))
 ```
+
+
+
+|drugBankID |uniProtID |proteinName                     |
+|:----------|:---------|:-------------------------------|
+|DB00334    |P28223    |5-hydroxytryptamine receptor 2A |
+|DB00334    |P14416    |D(2) dopamine receptor          |
+|DB00334    |P21728    |D(1A) dopamine receptor         |
+|DB00334    |P21918    |D(1B) dopamine receptor         |
+|DB00334    |P35462    |D(3) dopamine receptor          |
 
 * Subquery with `FROM` clause
 
@@ -359,18 +630,39 @@ SELECT sub.column_name(s) FROM (Subquery);
 
 The results from query 2a can also be obtained with the combination of subquery and an `INNER JOIN`.
 
-```{r sub_4_1}
+
+```r
 kable(dbGetQuery(drugs,
 "SELECT DISTINCT dt.uniProtID, dt.proteinName,sub.drugs_count FROM drugs_target AS dt INNER JOIN(SELECT uniProtID, COUNT(drugBankID) AS drugs_count FROM drugs_target GROUP BY uniProtID) AS sub USING(uniProtID) ORDER BY sub.drugs_count DESC LIMIT 5"))
 ```
+
+
+
+|uniProtID |proteinName                                      | drugs_count|
+|:---------|:------------------------------------------------|-----------:|
+|P14867    |Gamma-aminobutyric acid receptor subunit alpha-1 |          89|
+|P35348    |Alpha-1A adrenergic receptor                     |          88|
+|P35367    |Histamine H1 receptor                            |          84|
+|P11229    |Muscarinic acetylcholine receptor M1             |          80|
+|P14416    |D(2) dopamine receptor                           |          76|
 
 **Example 5:**
 
 Select UniProt id, and count of drugs that bind to various *opioid receptors* (the type of proteins) from *drugs_target* table.
 
-```{r sub_5_1}
+
+```r
 kable(dbGetQuery(drugs,"SELECT A.uniProtID,A.proteinName, COUNT(A.drugBankID) AS drug_count FROM (SELECT * FROM drugs_target WHERE proteinName LIKE '%opioid%') AS A GROUP BY uniProtID,proteinName"))
 ```
+
+
+
+|uniProtID |proteinName                               | drug_count|
+|:---------|:-----------------------------------------|----------:|
+|P35372    |Mu-type opioid receptor                   |         40|
+|P41143    |Delta-type opioid receptor                |         28|
+|P41145    |Kappa-type opioid receptor                |         32|
+|Q99720    |Sigma non-opioid intracellular receptor 1 |          6|
 
 ### Exercise 2
 
@@ -378,17 +670,35 @@ kable(dbGetQuery(drugs,"SELECT A.uniProtID,A.proteinName, COUNT(A.drugBankID) AS
 
 _Sample Output_  
 
-```{r ex2_1}
+
+```r
 kable(dbGetQuery(drugs,"SELECT drugBankID, uniProtID, proteinName FROM drugs_target WHERE drugBankID IN (SELECT drugBankID FROM drugs_target GROUP BY drugBankID HAVING COUNT(uniProtID) = 1) LIMIT 5"))
 ```
+
+
+
+|drugBankID |uniProtID |proteinName                               |
+|:----------|:---------|:-----------------------------------------|
+|DB00001    |P00734    |Prothrombin                               |
+|DB00006    |P00734    |Prothrombin                               |
+|DB00007    |P30968    |Gonadotropin-releasing hormone receptor   |
+|DB00010    |Q02643    |Growth hormone-releasing hormone receptor |
+|DB00012    |P19235    |Erythropoietin receptor                   |
 
 **2. Find average molecular weight, hydrogen bond acceptors, hydrogen bond donors and rotatable bonds for drugs that bind _Kinase proteins_.**
 
 _Sample Output_ 
 
-```{r ex2_2}
+
+```r
 kable(dbGetQuery(drugs,"SELECT AVG(molecular_weight), AVG(hbond_acceptors), AVG(hbond_donors), AVG(rotatable_bond) FROM drugs_data WHERE cid IN(SELECT cid FROM drugs_names WHERE drugBankID IN (SELECT DISTINCT drugBankID FROM drugs_target WHERE proteinName LIKE '%kinase%'))"))
 ```
+
+
+
+| AVG(molecular_weight)| AVG(hbond_acceptors)| AVG(hbond_donors)| AVG(rotatable_bond)|
+|---------------------:|--------------------:|-----------------:|-------------------:|
+|               327.664|                 5.95|             2.675|                4.45|
 
 ## JOINS
 
@@ -419,17 +729,39 @@ SELECT table1.column_name(s), table2.column_name(s) FROM table1 INNER JOIN table
 
 Select drugbank id, drug name and drug properties using *drugs_name* and *drugs_data* table. 
 
-```{r inner_1}
+
+```r
 kable(dbGetQuery(drugs, "SELECT drugs_names.drugBankID, drugs_names.name, drugs_data.molecular_formula, drugs_data.molecular_weight, drugs_data.hbond_acceptors, drugs_data.hbond_donors FROM drugs_names INNER JOIN drugs_data ON drugs_names.cid = drugs_data.cid LIMIT 5"))
 ```
+
+
+
+|drugBankID |name                 |molecular_formula | molecular_weight| hbond_acceptors| hbond_donors|
+|:----------|:--------------------|:-----------------|----------------:|---------------:|------------:|
+|DB00115    |Cyanocobalamin       |C63H89CoN14O14P   |         1356.396|              21|           10|
+|DB00116    |Tetrahydrofolic acid |C19H23N7O6        |          445.436|               9|            8|
+|DB00117    |L-Histidine          |C6H9N3O2          |          155.157|               4|            3|
+|DB00118    |S-Adenosylmethionine |C15H23N6O5S+      |          399.446|              10|            5|
+|DB00119    |Pyruvic acid         |C3H4O3            |           88.062|               3|            1|
 
 **Alias:**
 
 Instead of writing a full table name, it is possible to use alias as a shortcut for example, the above query can also be run in the following manner: 
 
-```{r inner_2}
+
+```r
 kable(dbGetQuery(drugs, "SELECT dn.drugBankID, dn.name, dd.molecular_formula, dd.molecular_weight, dd.hbond_acceptors, dd.hbond_donors FROM drugs_names AS dn INNER JOIN drugs_data AS dd ON dn.cid = dd.cid LIMIT 5"))
 ```
+
+
+
+|drugBankID |name                 |molecular_formula | molecular_weight| hbond_acceptors| hbond_donors|
+|:----------|:--------------------|:-----------------|----------------:|---------------:|------------:|
+|DB00115    |Cyanocobalamin       |C63H89CoN14O14P   |         1356.396|              21|           10|
+|DB00116    |Tetrahydrofolic acid |C19H23N7O6        |          445.436|               9|            8|
+|DB00117    |L-Histidine          |C6H9N3O2          |          155.157|               4|            3|
+|DB00118    |S-Adenosylmethionine |C15H23N6O5S+      |          399.446|              10|            5|
+|DB00119    |Pyruvic acid         |C3H4O3            |           88.062|               3|            1|
 
 **JOIN multiple tables**
 
@@ -437,9 +769,25 @@ kable(dbGetQuery(drugs, "SELECT dn.drugBankID, dn.name, dd.molecular_formula, dd
 
 Select drugbank id, drug name, molecular formula and the molecular weight of the drug and the protein name to which drug binds using *drugs_names*, *drugs_data* and *drugs_target* table. 
 
-```{r inner_3}
+
+```r
 kable(dbGetQuery(drugs, "SELECT dn.drugBankID, dn.name, dd.molecular_formula, dd.molecular_weight, dt.proteinName FROM drugs_names AS dn INNER JOIN drugs_data AS dd ON dn.cid = dd.cid INNER JOIN drugs_target AS dt ON dn.drugBankID = dt.drugBankID LIMIT 10"))
 ```
+
+
+
+|drugBankID |name                 |molecular_formula | molecular_weight|proteinName                                                                       |
+|:----------|:--------------------|:-----------------|----------------:|:---------------------------------------------------------------------------------|
+|DB00115    |Cyanocobalamin       |C63H89CoN14O14P   |         1356.396|Methionine synthase                                                               |
+|DB00115    |Cyanocobalamin       |C63H89CoN14O14P   |         1356.396|Methionine synthase reductase                                                     |
+|DB00115    |Cyanocobalamin       |C63H89CoN14O14P   |         1356.396|Methylenetetrahydrofolate reductase                                               |
+|DB00115    |Cyanocobalamin       |C63H89CoN14O14P   |         1356.396|Methylmalonic aciduria and homocystinuria type C protein                          |
+|DB00115    |Cyanocobalamin       |C63H89CoN14O14P   |         1356.396|Methylmalonic aciduria type A protein mitochondrial                               |
+|DB00115    |Cyanocobalamin       |C63H89CoN14O14P   |         1356.396|Methylmalonyl-CoA mutase mitochondrial                                            |
+|DB00116    |Tetrahydrofolic acid |C19H23N7O6        |          445.436|Aminomethyltransferase mitochondrial                                              |
+|DB00116    |Tetrahydrofolic acid |C19H23N7O6        |          445.436|Bifunctional methylenetetrahydrofolate dehydrogenase/cyclohydrolase mitochondrial |
+|DB00116    |Tetrahydrofolic acid |C19H23N7O6        |          445.436|Bifunctional purine biosynthesis protein PURH                                     |
+|DB00116    |Tetrahydrofolic acid |C19H23N7O6        |          445.436|C-1-tetrahydrofolate synthase cytoplasmic                                         |
 
 **USING Keyword**
 
@@ -447,9 +795,20 @@ If the key name is the same in the two tables being joined we can also use **USI
 
 **Example 3:**
 
-```{r inner_4}
+
+```r
 kable(dbGetQuery(drugs, "SELECT dn.drugBankID, dn.name, dd.molecular_formula, dd.molecular_weight, dd.hbond_acceptors, dd.hbond_donors FROM drugs_names AS dn INNER JOIN drugs_data AS dd USING(cid) LIMIT 5"))
 ```
+
+
+
+|drugBankID |name                 |molecular_formula | molecular_weight| hbond_acceptors| hbond_donors|
+|:----------|:--------------------|:-----------------|----------------:|---------------:|------------:|
+|DB00115    |Cyanocobalamin       |C63H89CoN14O14P   |         1356.396|              21|           10|
+|DB00116    |Tetrahydrofolic acid |C19H23N7O6        |          445.436|               9|            8|
+|DB00117    |L-Histidine          |C6H9N3O2          |          155.157|               4|            3|
+|DB00118    |S-Adenosylmethionine |C15H23N6O5S+      |          399.446|              10|            5|
+|DB00119    |Pyruvic acid         |C3H4O3            |           88.062|               3|            1|
 
 ### LEFT JOIN
 LEFT JOIN **keeps all the original rows of the left table** in addition to the matching rows from both tables. The values that do not match in the right table are marked as missing. In the animation below there are no values for ID 3 and 6 in the right table and therefore, are missing in the resulting LEFT JOIN table (grey shaded area). 
@@ -466,9 +825,20 @@ SELECT table1.column_name(s), table2.column_name(s) FROM table1 LEFT JOIN table2
 
 Select Drugbank ID, Protein name from *drugs_target* (left_table), Drug name and Drug cid from *drugs_names* (right_table).  
 
-```{r left_1}
+
+```r
 kable(dbGetQuery(drugs, "SELECT dt.drugBankID, dt.proteinName,dn.name,dn.cid FROM drugs_target AS dt LEFT JOIN drugs_names AS dn ON dt.drugBankID = dn.drugBankID ORDER BY dt.drugBankID LIMIT 5"))
 ```
+
+
+
+|drugBankID |proteinName                                                |name | cid|
+|:----------|:----------------------------------------------------------|:----|---:|
+|DB00001    |Prothrombin                                                |NA   |  NA|
+|DB00002    |Epidermal growth factor receptor                           |NA   |  NA|
+|DB00002    |Low affinity immunoglobulin gamma Fc region receptor III-B |NA   |  NA|
+|DB00002    |Complement C1r subcomponent                                |NA   |  NA|
+|DB00002    |Complement C1q subcomponent subunit A                      |NA   |  NA|
 
 **Note:** that the DrugBank ID starts from DB00115 in *drugs_names* table (table on the right in above query) and hence the corresponding values are NULL in the resulting table. The  `USING` keyword can also be used in a left join similar to an inner join.
 
@@ -493,9 +863,20 @@ SELECT table1.column_name(s), table2.column_name(s) FROM table2 LEFT JOIN table1
 
 Select Drugbank ID, Protein name from *drugs_target* (left_table), Drug name and Drug cid from *drugs_names* (right_table).  
 
-```{r rigth_1}
+
+```r
 kable(dbGetQuery(drugs, "SELECT dt.drugBankID, dt.proteinName,dn.name,dn.cid FROM drugs_names AS dn  LEFT JOIN drugs_target AS dt  ON dt.drugBankID = dn.drugBankID ORDER BY dt.drugBankID LIMIT 5"))
 ```
+
+
+
+|drugBankID |proteinName |name            |     cid|
+|:----------|:-----------|:---------------|-------:|
+|NA         |NA          |Xanthophyll     | 5368396|
+|NA         |NA          |Gadodiamide     |   60754|
+|NA         |NA          |Pipobroman      |    4842|
+|NA         |NA          |Calcium Acetate |    6116|
+|NA         |NA          |Crotamiton      |  688020|
 
 **Note:** This time the drugbank id and protein names columns have `NULL` values because there are 114 drugs in the left_table (drugs_names table) which do not have any corresponding information in the right table (drugs_target table). It means there is no information available on what and how many kinds of proteins these drugs bind.
 
@@ -522,12 +903,23 @@ SELECT table1.column_name(s), table2.column_name(s) FROM table1 RIGHT JOIN table
 
 Select Drugbank ID, Protein name from *drugs_target* (left_table), Drug name and Drug cid from *drugs_names* (right_table).  
 
-```{r full_1}
+
+```r
 kable(dbGetQuery(drugs, "SELECT dt.drugBankID as id_from_drugs_target, dt.proteinName, dn.drugBankID AS id_from_drugs_names, dn.name FROM drugs_names AS dn LEFT JOIN drugs_target AS dt ON dt.drugBankID = dn.drugBankID 
   UNION ALL 
   SELECT dt.drugBankID, dt.proteinName, dn.drugBankID,dn.name FROM drugs_target AS dt LEFT JOIN drugs_names AS dn ON dt.drugBankID = dn.drugBankID 
   ORDER BY id_from_drugs_names,id_from_drugs_target LIMIT 5"))
 ```
+
+
+
+|id_from_drugs_target |proteinName                                                |id_from_drugs_names |name |
+|:--------------------|:----------------------------------------------------------|:-------------------|:----|
+|DB00001              |Prothrombin                                                |NA                  |NA   |
+|DB00002              |Epidermal growth factor receptor                           |NA                  |NA   |
+|DB00002              |Low affinity immunoglobulin gamma Fc region receptor III-B |NA                  |NA   |
+|DB00002              |Complement C1r subcomponent                                |NA                  |NA   |
+|DB00002              |Complement C1q subcomponent subunit A                      |NA                  |NA   |
 
 ### CROSS JOIN
 
@@ -553,9 +945,20 @@ The `CROSS JOIN` query does not make sense in this dataset however, it was run f
 
 Select Drugbank ID, Drug name, Protein name from *drugs_target* and *drugs_names* table.  
 
-```{r cross_1}
+
+```r
 kable(dbGetQuery(drugs,"SELECT dt.drugBankID, dn.name, dt.proteinName FROM drugs_names AS dn CROSS JOIN drugs_target AS dt LIMIT 5"))
 ```
+
+
+
+|drugBankID |name           |proteinName                                                |
+|:----------|:--------------|:----------------------------------------------------------|
+|DB00001    |Cyanocobalamin |Prothrombin                                                |
+|DB00002    |Cyanocobalamin |Epidermal growth factor receptor                           |
+|DB00002    |Cyanocobalamin |Low affinity immunoglobulin gamma Fc region receptor III-B |
+|DB00002    |Cyanocobalamin |Complement C1r subcomponent                                |
+|DB00002    |Cyanocobalamin |Complement C1q subcomponent subunit A                      |
 
 ### SELF JOIN
 
@@ -573,16 +976,39 @@ Select drugbank ids from *drugs_target* table which bind to both the proteins wi
 
 The following query will not work because it is not possible for the value of a single column in a single row to contain two values at the same time. 
 
-```{r self_1}
+
+```r
 kable(dbGetQuery(drugs,"SELECT dt.drugBankID FROM drugs_target AS dt WHERE dt.uniProtID = 'P28223' AND dt.uniProtID = 'P46098'"))
 ```
 
+
+
+|drugBankID |
+|:----------|
+
 This query will require a `SELF JOIN`. The correct query is as follows:
 
-```{r self_2}
+
+```r
 kable(dbGetQuery(drugs,
 "SELECT DISTINCT dt1.drugBankID FROM drugs_target dt1, drugs_target dt2 WHERE dt1.drugBankID = dt2.drugBankID AND dt1.uniProtID = 'P28223' AND dt2.uniprotID = 'P46098'"))
 ```
+
+
+
+|drugBankID |
+|:----------|
+|DB00246    |
+|DB00334    |
+|DB00363    |
+|DB00370    |
+|DB00408    |
+|DB00543    |
+|DB00604    |
+|DB00726    |
+|DB01049    |
+|DB01224    |
+|DB01238    |
 
 ### Exercise 3
 
@@ -590,17 +1016,39 @@ kable(dbGetQuery(drugs,
 
 _Sample Output_ 
 
-```{r ex3_1 }
+
+```r
 kable(dbGetQuery(drugs,"SELECT cid,B.drugBankID,B.uniProtID, B.count FROM (SELECT drugBankID, A.uniProtID, A.count FROM drugs_target INNER JOIN (SELECT uniProtID, COUNT(uniProtID) AS count FROM drugs_target GROUP BY uniProtID) AS A USING(uniProtID) ORDER BY uniProtID) AS B LEFT JOIN drugs_names USING(drugBankID) ORDER BY B.uniProtID LIMIT 5"))
 ```
+
+
+
+|     cid|drugBankID |uniProtID  | count|
+|-------:|:----------|:----------|-----:|
+|      NA|DB09060    |A0A023W3H0 |     1|
+|  166548|DB00362    |A2QLK4     |     3|
+| 2826718|DB00520    |A2QLK4     |     3|
+|  477468|DB01141    |A2QLK4     |     3|
+|     702|DB00898    |A5X5Y0     |     2|
 
 **2. Find those proteins and drugs which have only 1 binding partner and drug type in not _BiotechDrug_. For example, a drug should bind to a single protein target and a protein target should bind to a single drug.**
 
 _Sample Output_
 
-```{r ex3_2}
+
+```r
 kable(dbGetQuery(drugs,"SELECT drugBankID, name, sub.uniProtID, sub.proteinName FROM (SELECT drugBankID, uniProtID, proteinName, type FROM drugs_target WHERE uniProtID IN (SELECT uniProtID FROM drugs_target WHERE uniProtID IN (SELECT uniProtID FROM drugs_target WHERE drugBankID IN (SELECT drugBankID FROM drugs_target GROUP BY drugBankID HAVING COUNT(uniprotID) = 1)) GROUP BY uniProtID HAVING COUNT(drugBankID) = 1) AND type !='BiotechDrug') AS sub LEFT JOIN drugs_names USING(drugBankID) LIMIT 5"))
 ```
+
+
+
+|drugBankID |name         |uniProtID |proteinName                             |
+|:----------|:------------|:---------|:---------------------------------------|
+|DB00183    |Pentagastrin |P32239    |Gastrin/cholecystokinin type B receptor |
+|DB00220    |Nelfinavir   |O90777    |HIV-1 protease                          |
+|DB00348    |Nitisinone   |P32754    |4-hydroxyphenylpyruvate dioxygenase     |
+|DB00403    |NA           |P32238    |Cholecystokinin receptor type A         |
+|DB00410    |Mupirocin    |P41972    |Isoleucine--tRNA ligase                 |
 
 ## Set theory clauses
 
@@ -624,18 +1072,32 @@ Let us count the total Drugbank IDs from *drugs_target* and *drugs_names* tables
 
 Count `DISTINCT` drugBankIDs in *drugs_names* and *drugs_target* table individually.
 
-```{r union_1}
+
+```r
 kable(dbGetQuery(drugs,"SELECT COUNT(DISTINCT(drugs_target.drugBankID)) AS drugs_target_ids, COUNT(DISTINCT(drugs_names.drugBankID)) AS drugs_names_ids FROM drugs_target,drugs_names"))
 ```
+
+
+
+| drugs_target_ids| drugs_names_ids|
+|----------------:|---------------:|
+|             1623|            1189|
 
 **Example 2:**
 
 Count `DISTINCT` drugBankIDs in combined tables using `UNION`.
 
-```{r union_2}
+
+```r
 kable(dbGetQuery(drugs,
 "SELECT COUNT(drugBankID) AS union_drugbank_ids FROM (SELECT dn.drugBankID FROM drugs_names AS dn UNION  SELECT dt.drugBankID FROM drugs_target AS dt) AS sub"))
 ```
+
+
+
+| union_drugbank_ids|
+|------------------:|
+|               1732|
 
 ### UNION ALL
 
@@ -655,10 +1117,17 @@ SELECT table2.column_name(s) FROM table2
 
 Let us count the total Drugbank IDs from *drugs_target* and *drugs_names* tables using `UNION ALL` keyword.
 
-```{r union_all_1}
+
+```r
 kable(dbGetQuery(drugs,
 "SELECT COUNT(drugBankID) AS union_all_drugbank_ids FROM (SELECT dn.drugBankID FROM drugs_names AS dn UNION ALL SELECT dt.drugBankID FROM drugs_target AS dt) AS sub"))
 ```
+
+
+
+| union_all_drugbank_ids|
+|----------------------:|
+|                   8258|
 
 ### INTERSECT
 
@@ -679,17 +1148,31 @@ SELECT table2.column_name(s) FROM table2
 
 Let us count Drugbank IDs common in *drugs_target* and *drugs_names* tables using `INTERSECT` keyword.
 
-```{r intersect_1}
+
+```r
 kable(dbGetQuery(drugs,
 "SELECT COUNT(drugBankID) AS intersect_drugbank_ids FROM (SELECT dn.drugBankID FROM drugs_names AS dn INTERSECT SELECT dt.drugBankID FROM drugs_target AS dt) AS sub"))
 ```
 
+
+
+| intersect_drugbank_ids|
+|----------------------:|
+|                   1080|
+
 In MySQL `INTERSECT` keyword is not available, however, the effect can be simulated through `IN` operator.  
 
-```{r intersect_2}
+
+```r
 kable(dbGetQuery(drugs,
 "SELECT COUNT(drugBankID) AS in_drugbank_ids FROM (SELECT dn.drugBankID FROM drugs_names AS dn WHERE dn.drugBankID IN (SELECT dt.drugBankID FROM drugs_target AS dt)) AS sub"))
 ```
+
+
+
+| in_drugbank_ids|
+|---------------:|
+|            1080|
 
 ### EXCEPT 
 
@@ -710,16 +1193,30 @@ SELECT table2.column_name(s) FROM table2
 
 Let us count Drugbank IDs in *drugs_names* table which are not present in *drugs_target* table using `EXCEPT` keyword.
 
-```{r except_1}
+
+```r
 kable(dbGetQuery(drugs,"SELECT COUNT(drugBankID) AS except_id FROM (SELECT dn.drugBankID FROM drugs_names AS dn EXCEPT SELECT dt.drugBankID FROM drugs_target AS dt) AS sub"))
 ```
 
+
+
+| except_id|
+|---------:|
+|       109|
+
 MySQL does not support `EXCEPT` or `MINUS` keyword. However, the same result can be achieved using the `NOT IN` operator.  
 
-```{r except_2}
+
+```r
 kable(dbGetQuery(drugs,
 "SELECT COUNT(drugBankID) AS not_in_id FROM (SELECT dn.drugBankID FROM drugs_names AS dn WHERE dn.drugBankID NOT IN (SELECT dt.drugBankID FROM drugs_target AS dt)) AS sub"))
 ```
+
+
+
+| not_in_id|
+|---------:|
+|       109|
 
 ### Exercise 4
 
@@ -727,27 +1224,60 @@ kable(dbGetQuery(drugs,
 
 _Sample Output_   
 
-```{r ex4_1}
+
+```r
 kable(dbGetQuery(drugs,'SELECT dn.drugBankID FROM drugs_names AS dn UNION ALL SELECT dt.drugBankID FROM drugs_target AS dt LIMIT 5'))
 ```
+
+
+
+|drugBankID |
+|:----------|
+|DB00115    |
+|DB00116    |
+|DB00117    |
+|DB00118    |
+|DB00119    |
 
 **2. Select drugbank id, cid, name and molecular weight of drugs that are present in drugs_names table, however, missing from the drugs_target table. Do an `INNER JOIN` of the resulting table with the drugs_data table.** 
 
 _Sample Output_
 
-```{r ex4_2}
+
+```r
 kable(dbGetQuery(drugs,"SELECT sub.drugBankID, sub.cid, sub.name,molecular_weight FROM drugs_data INNER JOIN (SELECT dn.drugBankID,dn.cid,dn.name FROM drugs_names AS dn WHERE dn.drugBankID NOT IN (SELECT dt.drugBankID FROM drugs_target AS dt)) AS sub USING(cid) LIMIT 5"))
 ```
+
+
+
+|drugBankID |     cid|name            | molecular_weight|
+|:----------|-------:|:---------------|----------------:|
+|DB00137    | 5368396|Xanthophyll     |          568.886|
+|DB00225    |   60754|Gadodiamide     |          591.676|
+|DB00236    |    4842|Pipobroman      |          356.058|
+|DB00258    |    6116|Calcium Acetate |          158.166|
+|DB00265    |  688020|Crotamiton      |          203.285|
 
 
 **3. Select drugbank id, cid, name and molecular weight of drugs that are present in both drugs_names and drugs_target table.**
 
 _Sample Output_
 
-```{r ex4_3}
+
+```r
 kable(dbGetQuery(drugs,
 "SELECT sub.drugBankID, sub.cid, sub.name,molecular_weight FROM (SELECT dn.drugBankID,dn.cid,dn.name FROM drugs_names AS dn WHERE dn.drugBankID IN (SELECT dt.drugBankID FROM drugs_target AS dt)) AS sub LEFT JOIN drugs_data USING(cid) LIMIT 5"))
 ```
+
+
+
+|drugBankID |      cid|name                 | molecular_weight|
+|:----------|--------:|:--------------------|----------------:|
+|DB00115    | 44176380|Cyanocobalamin       |         1356.396|
+|DB00116    |    91443|Tetrahydrofolic acid |          445.436|
+|DB00117    |     6274|L-Histidine          |          155.157|
+|DB00118    |    34756|S-Adenosylmethionine |          399.446|
+|DB00119    |     1060|Pyruvic acid         |           88.062|
 
 **4. Devise a query that will generate a sequence of numbers from 0 .. 99**
 
@@ -755,10 +1285,20 @@ _Hint:_ Use `UNION ALL` and `CROSS JOIN`
 
 _Sample Output_
 
-```{r ex4_4}
+
+```r
 kable(dbGetQuery(drugs,"SELECT ones.num + tens.num AS seq FROM (SELECT 0 num UNION ALL SELECT 1 num UNION ALL SELECT 2 num UNION ALL SELECT 3 num UNION ALL SELECT 4 num UNION ALL SELECT 5 num UNION ALL SELECT 6 num UNION ALL SELECT 7 num UNION ALL SELECT 8 num UNION ALL SELECT 9 num) ones CROSS JOIN (SELECT 0 num UNION ALL SELECT 10 num UNION ALL SELECT 20 num UNION ALL SELECT 30 num UNION ALL SELECT 40 num UNION ALL SELECT 50 num UNION ALL SELECT 60 num UNION ALL SELECT 70 num UNION ALL SELECT 80 num UNION ALL SELECT 90 num) tens ORDER BY seq LIMIT 5"))
-                 
 ```
+
+
+
+| seq|
+|---:|
+|   0|
+|   1|
+|   2|
+|   3|
+|   4|
 
 ## The SQL CASE Statements
 The `CASE` statement in SQL is a way to handle if/else logic. The `CASE` statement is followed by at least one pair of `WHEN` and `THEN` statements and ends by `END` keyword.  THE `ELSE` statement is optional and captures values not mentioned in `WHEN` and `THEN` statements.
@@ -789,9 +1329,25 @@ ELSE result END
 
 Suppose you want to find the drugs which are present in *drugs_target* table but not in *drugs_names* table.
 
-```{r case_1}
+
+```r
 kable(dbGetQuery(drugs,"SELECT dn.drugBankID, dt.name, CASE WHEN dn.drugBankID IS NULL THEN 'not' ELSE 'in' END AS in_drugs_names FROM drugs_target AS dt LEFT JOIN drugs_names AS dn USING(drugBankID) ORDER BY dt.name LIMIT 10"))
 ```
+
+
+
+|drugBankID |name                           |in_drugs_names |
+|:----------|:------------------------------|:--------------|
+|NA         |Insulin isophane               |not            |
+|NA         |Interferon Alfa-2a Recombinant |not            |
+|NA         |Interferon Alfa-2a Recombinant |not            |
+|NA         |Interferon Alfa-2b Recombinant |not            |
+|NA         |Interferon Alfa-2b Recombinant |not            |
+|NA         |ART-123                        |not            |
+|NA         |ART-123                        |not            |
+|NA         |AST-120                        |not            |
+|DB01048    |Abacavir                       |in             |
+|NA         |Abarelix                       |not            |
 
 ### Adding multiple conditions 
 
@@ -803,7 +1359,8 @@ Select cid, drug name, molecular formula and molecular weight of all drugs and g
 2. medium - drugs with the molecular weight of less than 400
 3. big - drugs with the molecular weight of above 400 
 
-```{r case_2}
+
+```r
 kable(dbGetQuery(drugs, 'SELECT cid,name, molecular_formula, molecular_weight, 
   CASE WHEN molecular_weight < 200 
   THEN "small"
@@ -813,6 +1370,16 @@ kable(dbGetQuery(drugs, 'SELECT cid,name, molecular_formula, molecular_weight,
   END AS size 
 FROM drugs_data INNER JOIN drugs_names USING (cid) LIMIT 5'))
 ```
+
+
+
+|      cid|name                 |molecular_formula | molecular_weight|size   |
+|--------:|:--------------------|:-----------------|----------------:|:------|
+| 44176380|Cyanocobalamin       |C63H89CoN14O14P   |         1356.396|big    |
+|    91443|Tetrahydrofolic acid |C19H23N7O6        |          445.436|big    |
+|     6274|L-Histidine          |C6H9N3O2          |          155.157|small  |
+|    34756|S-Adenosylmethionine |C15H23N6O5S+      |          399.446|medium |
+|     1060|Pyruvic acid         |C3H4O3            |           88.062|small  |
 
 **Explanation:**
 
@@ -827,9 +1394,18 @@ FROM drugs_data INNER JOIN drugs_names USING (cid) LIMIT 5'))
 
 Now count the drugs in each group from the query above.
 
-```{r case_3}
+
+```r
 kable(dbGetQuery(drugs,"SELECT CASE WHEN molecular_weight < 200    THEN 'small' WHEN molecular_weight < 400   THEN 'medium' ELSE 'big'  END AS size,COUNT(1) AS num_drugs FROM drugs_data INNER JOIN drugs_names USING (cid) GROUP BY size"))
 ```
+
+
+
+|size   | num_drugs|
+|:------|---------:|
+|big    |       318|
+|medium |       702|
+|small  |       162|
 
 
 ### Exercise 5 
@@ -844,10 +1420,17 @@ kable(dbGetQuery(drugs,"SELECT CASE WHEN molecular_weight < 200    THEN 'small' 
 
 _Sample Output_
 
-```{r ex5_1}
+
+```r
 kable(dbGetQuery(drugs,"SELECT SUM(CASE WHEN A.count<3 THEN 1 ELSE 0 END) AS less_than_3_drugs, SUM(CASE WHEN A.count>=4 AND A.count <= 10 THEN 1 ELSE 0 END) AS four_to_10_drugs, SUM( CASE WHEN A.count >= 11 THEN 1 ELSE 0 END) AS more_than_11_drugs FROM 
                  (SELECT DISTINCT dt.uniProtID, dt.proteinName,sub.count FROM drugs_target AS dt INNER JOIN (SELECT uniProtID, COUNT(drugBankID) AS count FROM drugs_target GROUP BY uniProtID) AS sub USING(uniProtID) ORDER BY sub.count) AS A"))
 ```
+
+
+
+| less_than_3_drugs| four_to_10_drugs| more_than_11_drugs|
+|-----------------:|----------------:|------------------:|
+|              1352|              197|                131|
 
 **Note:** There are a large number of protein targets that bind up to 3 different drugs compared to protein targets which bind 4 or more different drugs. Based on this data we may conclude that protein targets are quite specific for the kind of drugs they bind.
 
@@ -859,10 +1442,17 @@ kable(dbGetQuery(drugs,"SELECT SUM(CASE WHEN A.count<3 THEN 1 ELSE 0 END) AS les
 
 _Sample Output_
 
-```{r ex5_2}
+
+```r
 kable(dbGetQuery(drugs,"SELECT SUM(CASE WHEN A.count<3 THEN 1 ELSE 0 END) AS less_than_3_protein_targets, SUM(CASE WHEN A.count>=4 AND A.count <= 10 THEN 1 ELSE 0 END) AS four_to_10_protein_targets, SUM( CASE WHEN A.count >= 11 THEN 1 ELSE 0 END) AS more_than_11_protein_targets FROM 
 (SELECT DISTINCT dn.drugBankID, dn.name,sub.count FROM drugs_names AS dn INNER JOIN (SELECT drugBankID, COUNT(uniProtID) AS count FROM drugs_target GROUP BY drugBankID) AS sub USING(drugBankID) ORDER BY sub.count) AS A"))
 ```
+
+
+
+| less_than_3_protein_targets| four_to_10_protein_targets| more_than_11_protein_targets|
+|---------------------------:|--------------------------:|----------------------------:|
+|                         609|                        241|                          114|
 
 **Note:** There are 609 drugs that bind 3 or fewer protein targets. We again observe high specificity for drugs and protein targets.
 
@@ -873,6 +1463,22 @@ kable(dbGetQuery(drugs,"SELECT SUM(CASE WHEN A.count<3 THEN 1 ELSE 0 END) AS les
 
 _Sample Output_
 
-```{r ex5_3}
+
+```r
 kable(dbGetQuery(drugs,"SELECT DISTINCT drugBankID, CASE WHEN name LIKE '%ab' THEN 'Antibody' ELSE 'Not Antibody' END class FROM drugs_target WHERE type = 'BiotechDrug' LIMIT 10"))
 ```
+
+
+
+|drugBankID |class        |
+|:----------|:------------|
+|DB00001    |Not Antibody |
+|DB00002    |Antibody     |
+|DB00004    |Not Antibody |
+|DB00005    |Not Antibody |
+|DB00007    |Not Antibody |
+|DB00008    |Not Antibody |
+|DB00009    |Not Antibody |
+|DB00010    |Not Antibody |
+|DB00011    |Not Antibody |
+|DB00012    |Not Antibody |
