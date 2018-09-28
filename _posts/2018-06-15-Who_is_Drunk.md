@@ -19,7 +19,7 @@ for *italics*
 
 for **bold**
 
-What about a [link](_posts/SQL_Intermediate.html)
+What about a [link](SQL_Intermediate.html)
 
 Here is a bulleted list:
 * First
