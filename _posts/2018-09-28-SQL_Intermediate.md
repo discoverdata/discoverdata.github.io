@@ -1,25 +1,21 @@
 ---
+
 title: "Intermediate SQL course"
 author_profile: true
+tags: [R,SQL]
+header:
+ image: "images/sql/sql.svg"
+excerpt: "SQL tutorial"
 date: "26 September 2018"
 toc: true
+toc_label: "Table of Contents"
 toc_sticky: true
-output:
-  layout: default
-    highlight: kate
-    code_folding: hide
-    number_sections: yes
-    toc: yes
-    toc_float:
-      collapsed: yes
-      smooth_scroll: yes
+
 ---
-
-
 
 # Welcome
 
-![](images/sql/sql.svg){width=300px}
+![]({{ site.url }}{{ site.baseurl }}/assets/images/sql/sql.svg)
 
 ---
 
