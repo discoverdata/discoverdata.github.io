@@ -1,0 +1,22 @@
+name: "Varun Khanna"
+output_dir: "."
+navbar:
+  title: "Varun Lhanna"
+  left:
+    - icon: fa-linkedin fa-2x
+      href: https://www.linkedin.com/in/vkhanna/
+    - icon: fa-github fa-2x
+      href: https://github.com/discoverdata
+  right:
+    - text: "About"
+      href: About.html
+    - text: "Research"
+      href: Research.html
+    - text: "Blog"
+      href: Blog.html
+    - text: "CV"
+      href: CV/Varun_Khanna_CV.html
+output:
+    html_document:
+        theme: cosmo
+highlight: kate
