@@ -1,7 +1,9 @@
 ---
+
 layout: default
 title: E-books
 permalink: /ebooks/
+
 ---
 # Notable ebooks
 

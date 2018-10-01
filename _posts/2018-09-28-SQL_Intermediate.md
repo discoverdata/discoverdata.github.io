@@ -4,14 +4,17 @@ title: "Intermediate SQL course"
 author_profile: true
 tags: [R,SQL]
 layout: single
- classes: wide
+classes: wide
 header:
- image: "images/sql/sql.svg"
+ image: "assets/images/sql/sql.svg"
 excerpt: "SQL tutorial"
 date: "26 September 2018"
 toc: true
 toc_label: "Table of Contents"
-toc_sticky: false
+toc_sticky: true
+sidebar:
+ - title: "SQL Intermediate Tutorial"
+   image: "/assets/images/sql/sql.svg"
 
 ---
 
