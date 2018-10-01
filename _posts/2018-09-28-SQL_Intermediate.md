@@ -3,23 +3,25 @@
 title: "Intermediate SQL course"
 author_profile: true
 tags: [R,SQL]
+layout: single
+ classes: wide
 header:
  image: "images/sql/sql.svg"
 excerpt: "SQL tutorial"
 date: "26 September 2018"
 toc: true
 toc_label: "Table of Contents"
-toc_sticky: true
+toc_sticky: false
 
 ---
 
 # Welcome
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/sql/sql.svg)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/sql/sql.svg){:height="500px" width="300px"}
 
 ---
 
-Hi, I am **Varun Khanna** and welcome to my free tutorial on **Intermediate ![](images/sql/sql.svg){width=30px}**. Mastering SQL or *sequel* is an essential skill in a data scientist's toolbox. 
+Hi, I am **Varun Khanna** and welcome to my free tutorial on **Intermediate ![](images/sql/sql.svg){:height ="30px" width="30px"}**. Mastering SQL or *sequel* is an essential skill in a data scientist's toolbox. 
 In this tutorial, you will learn to use **aggregate functions** like COUNT, MAX, AVG, SUM. You will find out how to perform complex operations using **subqueries**, how to join data from multiple tables in a single statement with **JOINS**? Finally, how to use **set operators** LIKE UNION, INTERSECT and EXCEPT and CASE statements in your SQL queries. The code and the data used in this tutorial are available for download and in fact, I encourage you to try to run the queries yourself with the help of the syntax provided and then check the answer.
 
 So, let's get started!!
@@ -716,8 +718,7 @@ To list data from two or more tables following is required:
 ### INNER JOIN
 In the animation below you can see that the **ID** field matches for 1 and 4 (shaded rows). INNER JOIN selects all the matching rows from both the tables. Mismatched rows are not shown.  
 
-![INNER_JOIN](images/inner.gif)
-
+![INNER_JOIN]({{ site.url }}{{ site.baseurl }}/assets/images/sql/inner.gif)
 **Syntax:**
 
 ```sql
