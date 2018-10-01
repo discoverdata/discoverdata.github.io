@@ -1,7 +1,9 @@
 ---
 title: "Intermediate SQL course"
-author: "Varun Khanna"
+author_profile: true
 date: "26 September 2018"
+toc: true
+toc_sticky: true
 output:
   layout: default
     highlight: kate
