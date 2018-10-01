@@ -17,11 +17,11 @@ output:
 
 # Welcome
 
-![](images/sql.svg){width=300px}
+![](images/sql/sql.svg){width=300px}
 
 ---
 
-Hi, I am **Varun Khanna** and welcome to my free tutorial on **Intermediate ![](images/sql.svg){width=30px}**. Mastering SQL or *sequel* is an essential skill in a data scientist's toolbox. 
+Hi, I am **Varun Khanna** and welcome to my free tutorial on **Intermediate ![](images/sql/sql.svg){width=30px}**. Mastering SQL or *sequel* is an essential skill in a data scientist's toolbox. 
 In this tutorial, you will learn to use **aggregate functions** like COUNT, MAX, AVG, SUM. You will find out how to perform complex operations using **subqueries**, how to join data from multiple tables in a single statement with **JOINS**? Finally, how to use **set operators** LIKE UNION, INTERSECT and EXCEPT and CASE statements in your SQL queries. The code and the data used in this tutorial are available for download and in fact, I encourage you to try to run the queries yourself with the help of the syntax provided and then check the answer.
 
 So, let's get started!!
